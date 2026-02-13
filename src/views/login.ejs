@@ -1,0 +1,18 @@
+<%- include('layout', {
+  body: `
+    <section class="auth">
+      <h2>Login</h2>
+      ${error ? `<p class="error">${error}</p>` : ''}
+      <form method="POST" action="/login">
+        <label>Username
+          <input type="text" name="username" required />
+        </label>
+        <label>Password
+          <input type="password" name="password" required />
+        </label>
+        <button type="submit">Login</button>
+      </form>
+      <p>No account? <a href="/register">Register here</a></p>
+    </section>
+  `
+}) %>

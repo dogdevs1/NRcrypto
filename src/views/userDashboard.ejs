@@ -1,0 +1,65 @@
+<%- include('layout', {
+  body: `
+    <section class="dashboard">
+      <h2>User Dashboard</h2>
+      <p>Current NR Silver price: <strong id="current-price">$${currentPrice}</strong> per unit</p>
+      <p>Your balance: <strong id="user-units">${user.balanceUnits}</strong> units</p>
+      <p>Your total value: <strong id="user-total-value">$${(user.balanceUnits * currentPrice).toFixed(2)}</strong></p>
+
+      <div class="actions">
+        <div>
+          <h3>Request to Buy</h3>
+          <form method="POST" action="/buy">
+            <label>Amount (units)
+              <input type="number" name="amountUnits" min="1" step="1" required />
+            </label>
+            <button type="submit">Request Buy</button>
+          </form>
+        </div>
+
+        <div>
+          <h3>Request to Sell</h3>
+          <form method="POST" action="/sell">
+            <label>Amount (units)
+              <input type="number" name="amountUnits" min="1" step="1" required />
+            </label>
+            <button type="submit">Request Sell</button>
+          </form>
+        </div>
+      </div>
+
+      <h3>Price History</h3>
+      <div class="range-buttons">
+        <button class="range-btn" data-range="1h">Last Hour</button>
+        <button class="range-btn" data-range="1d">Last Day</button>
+        <button class="range-btn" data-range="1m">Last Month</button>
+        <button class="range-btn" data-range="1y">Last Year</button>
+      </div>
+      <canvas id="price-chart" height="120"></canvas>
+
+      <h3>Recent Orders</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Price at Request</th>
+            <th>Status</th>
+            <th>Requested At</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${orders.map(o => `
+            <tr>
+              <td>${o.type}</td>
+              <td>${o.amountUnits}</td>
+              <td>$${o.pricePerUnitAtRequest}</td>
+              <td>${o.status}</td>
+              <td>${new Date(o.createdAt).toLocaleString()}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </section>
+  `
+}) %>

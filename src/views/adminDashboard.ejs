@@ -1,0 +1,89 @@
+<%- include('layout', {
+  body: `
+    <section class="dashboard">
+      <h2>Admin Dashboard</h2>
+      <p>Current NR Silver price: <strong id="current-price">$${currentPrice}</strong> per unit</p>
+      <p>Total units: <strong id="total-units">${totalUnits}</strong></p>
+      <p>Market Cap: <strong id="market-cap">$${marketCap}</strong></p>
+
+      <h3>Price History</h3>
+      <div class="range-buttons">
+        <button class="range-btn" data-range="1h">Last Hour</button>
+        <button class="range-btn" data-range="1d">Last Day</button>
+        <button class="range-btn" data-range="1m">Last Month</button>
+        <button class="range-btn" data-range="1y">Last Year</button>
+      </div>
+      <canvas id="price-chart" height="120"></canvas>
+
+      <h3>Pending Orders</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Price / Total Value</th>
+            <th>Requested At</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pendingOrders.map(o => `
+            <tr>
+              <td>${o.user.username}</td>
+              <td>${o.type}</td>
+              <td>${o.amountUnits}</td>
+              <td>
+                $${o.pricePerUnitAtRequest}
+                <br>
+                <small>Total: $${(o.pricePerUnitAtRequest * o.amountUnits).toFixed(2)}</small>
+              </td>
+              <td>${new Date(o.createdAt).toLocaleString()}</td>
+              <td>
+                <form method="POST" action="/admin/orders/${o._id}/approve" style="display:inline;">
+                  <button type="submit">Approve</button>
+                </form>
+                <form method="POST" action="/admin/orders/${o._id}/reject" style="display:inline;">
+                  <button type="submit">Reject</button>
+                </form>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+
+      <h3>Capitalization Table</h3>
+      <table id="cap-table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Units</th>
+            <th>Value</th>
+            <th>% Ownership</th>
+            <th>Adjust</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${users.map(u => `
+            <tr data-user-id="${u._id}">
+              <td>${u.username}</td>
+              <td class="cap-units">${u.balanceUnits}</td>
+              <td class="cap-value">$${(u.balanceUnits * currentPrice).toFixed(2)}</td>
+              <td class="cap-percent">${totalUnits > 0 ? ((u.balanceUnits / totalUnits) * 100).toFixed(2) : '0.00'}%</td>
+              <td>
+                <form method="POST" action="/admin/users/${u._id}/add" style="display:inline;">
+                  <input type="number" name="amountUnits" min="1" step="1" placeholder="Units" required />
+                  <button type="submit">Add</button>
+                </form>
+                <form method="POST" action="/admin/users/${u._id}/subtract" style="display:inline;">
+                  <input type="number" name="amountUnits" min="1" step="1" placeholder="Units" required />
+                  <button type="submit">Subtract</button>
+                </form>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </section>
+  `
+}) %>
